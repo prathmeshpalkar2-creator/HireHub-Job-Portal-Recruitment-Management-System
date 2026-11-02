@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: hirehub-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: hirehub_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+      - ./database/seed.sql:/docker-entrypoint-initdb.d/02_seed.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d hirehub_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - hirehub-net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: hirehub-backend
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PORT: 8080
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/hirehub_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgrespassword
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      JWT_SECRET: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+      JWT_EXPIRATION_MS: 86400000
+      INITIAL_ADMIN_EMAIL: admin@hirehub.com
+      INITIAL_ADMIN_PASSWORD: Admin@123456
+      INITIAL_ADMIN_NAME: "HireHub System Administrator"
+      FILE_UPLOAD_DIR: uploads/resumes
+    ports:
+      - "8080:8080"
+    volumes:
+      - resume_uploads:/app/uploads/resumes
+    networks:
+      - hirehub-net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: hirehub-frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+    networks:
+      - hirehub-net
+
+volumes:
+  postgres_data:
+    driver: local
+  resume_uploads:
+    driver: local
+
+networks:
+  hirehub-net:
+    driver: bridge

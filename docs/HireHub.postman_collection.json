@@ -1,0 +1,201 @@
+{
+  "info": {
+    "name": "HireHub - Job Portal & Recruitment Management API",
+    "description": "Comprehensive Postman collection for HireHub REST API v1 (Candidate, Recruiter, Admin, Jobs, Applications, Notifications).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register Candidate",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Jane Candidate\",\n  \"email\": \"jane.candidate@example.com\",\n  \"password\": \"Secret@123\",\n  \"phone\": \"+1-555-0199\",\n  \"headline\": \"Senior Frontend Developer (React, TypeScript)\",\n  \"skills\": \"React, JavaScript, HTML5, CSS3, Tailwind CSS\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/register/candidate", "host": ["{{baseUrl}}"], "path": ["auth", "register", "candidate"] }
+          }
+        },
+        {
+          "name": "Register Recruiter",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"David Talent\",\n  \"email\": \"david.talent@apextech.com\",\n  \"password\": \"Secret@123\",\n  \"phone\": \"+1-555-0188\",\n  \"designation\": \"Technical Recruiter\",\n  \"companyName\": \"Apex Technologies\",\n  \"companyWebsite\": \"https://apextech.example.com\",\n  \"companyLocation\": \"Austin, TX\",\n  \"companyDescription\": \"Fast growing fintech scale-up building banking APIs.\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/register/recruiter", "host": ["{{baseUrl}}"], "path": ["auth", "register", "recruiter"] }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@hirehub.com\",\n  \"password\": \"Admin@123456\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "Get Current User (Me)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/auth/me", "host": ["{{baseUrl}}"], "path": ["auth", "me"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Jobs",
+      "item": [
+        {
+          "name": "Search & Browse Public Jobs",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/jobs?search=Java&employmentType=REMOTE&page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["jobs"],
+              "query": [
+                { "key": "search", "value": "Java" },
+                { "key": "employmentType", "value": "REMOTE" },
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Job by ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/jobs/1", "host": ["{{baseUrl}}"], "path": ["jobs", "1"] }
+          }
+        },
+        {
+          "name": "Create Job (Recruiter Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Staff Java Backend Engineer\",\n  \"description\": \"Lead architecting scalable microservices using Spring Boot 3.\",\n  \"requiredSkills\": \"Java 17, Spring Boot, PostgreSQL, Docker, AWS\",\n  \"location\": \"Remote\",\n  \"employmentType\": \"REMOTE\",\n  \"experienceRequirements\": \"7+ years\",\n  \"minSalary\": 160000,\n  \"maxSalary\": 210000,\n  \"openings\": 2,\n  \"qualificationRequirements\": \"B.S. in Computer Science or equivalent\",\n  \"applicationDeadline\": \"2027-01-01\",\n  \"status\": \"OPEN\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/jobs", "host": ["{{baseUrl}}"], "path": ["jobs"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Job Applications",
+      "item": [
+        {
+          "name": "Apply for Job (Candidate)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobId\": 1,\n  \"coverLetter\": \"I have 5+ years of experience in Java and React and would love to contribute to TechCorp Innovations.\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/applications", "host": ["{{baseUrl}}"], "path": ["applications"] }
+          }
+        },
+        {
+          "name": "Get Candidate Applications",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/applications/me", "host": ["{{baseUrl}}"], "path": ["applications", "me"] }
+          }
+        },
+        {
+          "name": "Update Application Status (Recruiter)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"SHORTLISTED\",\n  \"notes\": \"Candidate profile matches job requirements.\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/applications/1/status", "host": ["{{baseUrl}}"], "path": ["applications", "1", "status"] }
+          }
+        },
+        {
+          "name": "Withdraw Application (Candidate)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/applications/1/withdraw", "host": ["{{baseUrl}}"], "path": ["applications", "1", "withdraw"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin Module",
+      "item": [
+        {
+          "name": "Admin Dashboard Stats",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/admin/dashboard", "host": ["{{baseUrl}}"], "path": ["admin", "dashboard"] }
+          }
+        },
+        {
+          "name": "Get Pending Recruiters",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/admin/recruiters?approved=false", "host": ["{{baseUrl}}"], "path": ["admin", "recruiters"], "query": [{ "key": "approved", "value": "false" }] }
+          }
+        },
+        {
+          "name": "Approve Recruiter",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"approved\": true,\n  \"notes\": \"Verified corporate domain and identity.\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/admin/recruiters/1/approval", "host": ["{{baseUrl}}"], "path": ["admin", "recruiters", "1", "approval"] }
+          }
+        }
+      ]
+    }
+  ]
+}
